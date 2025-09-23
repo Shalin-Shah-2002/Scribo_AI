@@ -17,6 +17,10 @@ function App() {
   const [platform, setPlatform] = useState('')
   const [duration, setDuration] = useState('')
   const [audience, setAudience] = useState('')
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('scribo_dark_mode')
+    return saved ? JSON.parse(saved) : false
+  })
 
   // Show API key modal on first load if no API key is configured
   useEffect(() => {
@@ -24,6 +28,23 @@ function App() {
       setTimeout(() => setShowApiKeyModal(true), 500)
     }
   }, [])
+
+  // Apply dark mode class to body element
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode')
+      document.documentElement.classList.add('dark-mode')
+    } else {
+      document.body.classList.remove('dark-mode')
+      document.documentElement.classList.remove('dark-mode')
+    }
+  }, [darkMode])
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode
+    setDarkMode(newDarkMode)
+    localStorage.setItem('scribo_dark_mode', JSON.stringify(newDarkMode))
+  }
 
   const navigationItems = [
     { id: 'script', name: 'Script', icon: '📝', description: 'Generate full scripts' },
@@ -231,7 +252,7 @@ function App() {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000${endpoints[activeTool]}`, {
+      const response = await fetch(`http://localhost:8080${endpoints[activeTool]}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -259,7 +280,7 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app ${darkMode ? 'dark-mode' : ''}`}>
       <header className="app-header">
         <div className="header-content">
           <div className="brand">
@@ -284,6 +305,15 @@ function App() {
           </nav>
 
           <div className="header-actions">
+            <button
+              onClick={toggleDarkMode}
+              className="theme-toggle-btn"
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              <span className="theme-icon">{darkMode ? '☀️' : '🌙'}</span>
+              <span className="theme-text">{darkMode ? 'Light' : 'Dark'}</span>
+            </button>
+            
             <button
               onClick={openApiKeyModal}
               className={`api-key-btn ${apiKey ? 'configured' : 'not-configured'}`}
@@ -320,6 +350,20 @@ function App() {
                 </div>
               </button>
             ))}
+            
+            <button
+              onClick={() => {
+                toggleDarkMode()
+                setIsMobileMenuOpen(false)
+              }}
+              className="mobile-nav-item theme-toggle-mobile"
+            >
+              <span className="nav-icon">{darkMode ? '☀️' : '🌙'}</span>
+              <div className="nav-content">
+                <span className="nav-text">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                <span className="nav-desc">Switch to {darkMode ? 'light' : 'dark'} theme</span>
+              </div>
+            </button>
             
             <button
               onClick={() => {
