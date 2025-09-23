@@ -550,7 +550,9 @@ textarea.form-input {
   height: 100%;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  /* Allow inner scrolling so the Generate button is never cut off */
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
   flex: 1;
   min-height: 0;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
@@ -664,7 +666,11 @@ textarea.form-input {
   box-shadow: var(--shadow-natural);
   letter-spacing: 0.01em;
   margin-top: 1rem;
-  position: relative;
+  /* Keep the button visible at the bottom of the form card */
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background-clip: padding-box;
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -1710,6 +1716,7 @@ textarea.form-input {
   border-left: 4px solid var(--primary-indigo);
   flex-shrink: 0;
   box-shadow: var(--shadow-soft);
+  scroll-margin-bottom: 80px; /* avoid being hidden behind sticky button */
 }
 
 .template-preview h4 {
